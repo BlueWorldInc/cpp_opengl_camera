@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <camera.h>
 #define GL_SILENCE_DEPRECATION 1
 
 const unsigned int steps = 100;
@@ -18,3 +19,4 @@ const double stepAngle = 3.1415926f * 2.f / steps;
 
 void drawCircle(double red, double green, double blue);
 void drawPlanet(double angle, double distance, double diameter, double red, double green, double blue);
+void processInput(GLFWwindow* window, Camera* camera);

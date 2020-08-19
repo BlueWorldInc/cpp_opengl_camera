@@ -300,26 +300,14 @@ int main(void) {
 
     // camera
 
-    glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
-    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-    glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
-    const float cameraSpeed = 0.05f; // adjust accordingly
-
-    // Camera cam(glm::vec3(0.0f, 0.0f,  3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f,  0.0f), glm::vec3(0.0f, 1.0f,  0.0f));
-    // Camera cam(cameraPos, cameraPos, cameraPos, cameraPos);
-
-    Camera cam(cameraPos, cameraFront, cameraUp, cameraSpeed);
-    Camera* cam_ptr = &cam;
-
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
     glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
     glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
     glm::vec3 cameraRight = glm::normalize(glm::cross(upVector, cameraDirection));
-    glm::vec3 up = glm::cross(cameraDirection, cameraRight);
+    glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
     glm::mat4 camera = glm::mat4(1.0f);
 
-    camera = glm::lookAt(cam.cameraPos, cameraPos + cameraFront, up);
-    
     GLint uniformCam = glGetUniformLocation(shaderProgram, "camera");
     glUniformMatrix4fv(uniformCam, 1, GL_FALSE, glm::value_ptr(camera));
 
@@ -327,14 +315,6 @@ int main(void) {
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
-
-        processInput(window, cam_ptr);
-
-        // printf("%d\n", cam.a);
-
-        // if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        //     cameraPos += cameraSpeed * cameraFront;
-        // }
 
         glClearColor(0, 0, 0, 0);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -344,7 +324,7 @@ int main(void) {
         float camX = sin(glfwGetTime()) * radius;
         float camZ = cos(glfwGetTime()) * radius;
 
-        camera = glm::lookAt(cam.cameraPos, cameraPos + cameraFront, up);
+        camera = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
         glUniformMatrix4fv(uniformCam, 1, GL_FALSE, glm::value_ptr(camera));
 
         glDrawElements(GL_LINES, sizeof(indices), GL_UNSIGNED_BYTE, 0);
@@ -356,18 +336,4 @@ int main(void) {
 
     glfwTerminate();
     return 0;
-}
-
-void processInput(GLFWwindow *window, Camera* camera)
-{
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        (*camera).cameraPos += (*camera).cameraSpeed * (*camera).cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        (*camera).cameraPos -= (*camera).cameraSpeed * (*camera).cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        (*camera).cameraPos -= glm::normalize(glm::cross((*camera).cameraFront, (*camera).cameraUp)) * (*camera).cameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        (*camera).cameraPos += glm::normalize(glm::cross((*camera).cameraFront, (*camera).cameraUp)) * (*camera).cameraSpeed;
 }
