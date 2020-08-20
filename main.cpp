@@ -1,7 +1,8 @@
 #include <app.h>
 
 const GLchar* vertex120 = R"END(
-#version 120
+#version 330 core
+layout (location = 0) in vec3 aPos;
 attribute vec3 position;
 attribute vec3 color;
 attribute vec2 inUvs;
@@ -13,27 +14,9 @@ uniform mat4 projection;
 uniform mat4 camera;
 void main()
 {
-    float theta = time;
-    
-    float co = cos(theta);
-    float si = sin(theta);
-    
-    mat4 rotationY = mat4(co, 0, si,  0,
-                          0,  1,  0,  0,
-                          -si,  0, co, 0,
-                          0,  0,  0,  1);
-
-    co = cos(theta/2.);
-    si = sin(theta/2.);
-
-    mat4 rotationX = mat4(1, 0, 0, 0,
-                          0, co, -si, 0,
-                          0, si, co, 0,
-                          0, 0, 0, 1);
-
     outColor = color;
     outUvs = inUvs;
-    gl_Position = projection * matrix * camera * rotationY * rotationX * vec4(position,1.f);
+    gl_Position = projection * matrix * camera * vec4(position, 1.f);
 }
 )END";
 
@@ -377,6 +360,7 @@ int main(void) {
         float camZ = cos(glfwGetTime()) * radius;
 
         camera = glm::lookAt(cam.cameraPos, cam.cameraPos + cam.cameraFront, cam.cameraUp);
+        
         glUniformMatrix4fv(uniformCam, 1, GL_FALSE, glm::value_ptr(camera));
 
         glDrawElements(GL_LINES, sizeof(indices), GL_UNSIGNED_BYTE, 0);
@@ -464,6 +448,8 @@ void mouse_callback(GLFWwindow* window, Mouse* mouse, Camera* camera, float* yaw
     direction.y = sin(glm::radians((*pitch)));
     direction.z = sin(glm::radians((*yaw))) * cos(glm::radians((*pitch)));
     (*camera).cameraFront = glm::normalize(direction);
+
+    std::cout << glm::to_string((*camera).cameraFront) << std::endl;
 
     _mouse_moved = false;
     } else if (_zoomed) {
