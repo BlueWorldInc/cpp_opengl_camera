@@ -328,21 +328,6 @@ int main(void) {
 
     const float radius = 1.0f;
 
-    // look around
-
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    float lastX = 400, lastY = 300;
-    float sensitivity = 0.1f;
-
-    Mouse mouse(lastX, lastY, sensitivity);
-    
-    glm::vec3 direction;
-    float yaw = -90.0f;
-    float pitch = 0.0f;
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
 
@@ -350,15 +335,6 @@ int main(void) {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         (*cam_ptr).cameraSpeed = 2.5f * deltaTime;
-
-        glfwSetCursorPosCallback(window, mouse_move_callback);
-        glfwSetScrollCallback(window, scroll_callback); 
-
-        mouse_callback(window, &mouse, &cam, &yaw, &pitch);
-
-        glm::mat4 projMatrix = glm::perspective(glm::radians((*cam_ptr).zoom), 1.f, 0.f, 10.f) * scaleMatrix;
-        GLint uniformProj = glGetUniformLocation(shaderProgram, "projection");
-        glUniformMatrix4fv(uniformProj, 1, GL_FALSE, glm::value_ptr(projMatrix));
 
         processInput(window, cam_ptr);
 
@@ -404,71 +380,4 @@ void processInput(GLFWwindow *window, Camera* camera)
         (*camera).cameraPos += glm::normalize(glm::cross((*camera).cameraFront, (*camera).cameraUp)) * (*camera).cameraSpeed;
         std::cout << glm::to_string((*camera).cameraPos) << std::endl;
     }
-}
-
-void mouse_move_callback(GLFWwindow* window, double xpos, double ypos) {
-    _xPos = xpos;
-    _yPos = ypos;
-    _mouse_moved = true;
-   
-}
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-    _camera_zoom -= (float)yoffset;
-    if (_camera_zoom < 1.0f)
-        _camera_zoom = 1.0f;
-    if (_camera_zoom > 90.0f)
-        _camera_zoom = 90.0f; 
-    _zoomed = true;
-}
-
-void mouse_callback(GLFWwindow* window, Mouse* mouse, Camera* camera, float* yaw, float* pitch) {
-
-    if (_mouse_moved) {
-
-    (*mouse).xPos = _xPos;
-    (*mouse).yPos = _yPos;
-
-    if ((*mouse).firstTime) {
-        (*mouse).lastX = (*mouse).xPos;
-        (*mouse).lastY = (*mouse).yPos;
-        (*mouse).firstTime = false;
-        printf("hello\n");
-    }
-  
-    float xoffset = (*mouse).xPos - (*mouse).lastX;
-    float yoffset = (*mouse).lastY - (*mouse).yPos; 
-
-    printf("----\n");
-    printf("%f\n", (*mouse).xPos);
-    printf("%f\n", (*mouse).yPos);
-    printf("%f\n", (*mouse).lastX);
-    printf("%f\n", (*mouse).lastY);
-
-    (*mouse).lastX = (*mouse).xPos;
-    (*mouse).lastY = (*mouse).yPos;
-    xoffset *= (*mouse).sensitivity;
-    yoffset *= (*mouse).sensitivity;
-
-    (*yaw)   += xoffset;
-    (*pitch) += yoffset;
-
-    if((*pitch) > 89.0f)
-        (*pitch) = 89.0f;
-    if((*pitch) < -89.0f)
-        (*pitch) = -89.0f;
-
-
-    glm::vec3 direction;
-    direction.x = cos(glm::radians((*yaw))) * cos(glm::radians((*pitch)));
-    direction.y = sin(glm::radians((*pitch)));
-    direction.z = sin(glm::radians((*yaw))) * cos(glm::radians((*pitch)));
-    (*camera).cameraFront = glm::normalize(direction);
-
-    _mouse_moved = false;
-    } else if (_zoomed) {
-        (*camera).zoom = _camera_zoom;
-        _zoomed = false;
-    }
-
 }
