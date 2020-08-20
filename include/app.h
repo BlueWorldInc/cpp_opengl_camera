@@ -6,12 +6,15 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <bmpread.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <camera.h>
+#include <glm/ext.hpp>
+#include <glm/gtx/string_cast.hpp>
 #define GL_SILENCE_DEPRECATION 1
 
 const unsigned int steps = 100;

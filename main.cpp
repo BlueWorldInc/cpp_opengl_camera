@@ -318,6 +318,9 @@ int main(void) {
     glm::vec3 up = glm::cross(cameraDirection, cameraRight);
     glm::mat4 camera = glm::mat4(1.0f);
 
+    float deltaTime = 0.0f;	// Time between current frame and last frame
+    float lastFrame = 0.0f; // Time of last frame
+
     camera = glm::lookAt(cam.cameraPos, cameraPos + cameraFront, up);
     
     GLint uniformCam = glGetUniformLocation(shaderProgram, "camera");
@@ -327,6 +330,11 @@ int main(void) {
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
+
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        (*cam_ptr).cameraSpeed = 2.5f * deltaTime;
 
         processInput(window, cam_ptr);
 
@@ -344,7 +352,7 @@ int main(void) {
         float camX = sin(glfwGetTime()) * radius;
         float camZ = cos(glfwGetTime()) * radius;
 
-        camera = glm::lookAt(cam.cameraPos, cameraPos + cameraFront, up);
+        camera = glm::lookAt(cam.cameraPos, cam.cameraPos + cam.cameraFront, cam.cameraUp);
         glUniformMatrix4fv(uniformCam, 1, GL_FALSE, glm::value_ptr(camera));
 
         glDrawElements(GL_LINES, sizeof(indices), GL_UNSIGNED_BYTE, 0);
@@ -368,6 +376,8 @@ void processInput(GLFWwindow *window, Camera* camera)
         (*camera).cameraPos -= (*camera).cameraSpeed * (*camera).cameraFront;
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         (*camera).cameraPos -= glm::normalize(glm::cross((*camera).cameraFront, (*camera).cameraUp)) * (*camera).cameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         (*camera).cameraPos += glm::normalize(glm::cross((*camera).cameraFront, (*camera).cameraUp)) * (*camera).cameraSpeed;
+        std::cout << glm::to_string((*camera).cameraPos) << std::endl;
+    }
 }
