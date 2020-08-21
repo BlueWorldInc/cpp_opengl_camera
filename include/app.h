@@ -30,6 +30,7 @@ float _camera_zoom = 60.0f;
 void drawCircle(double red, double green, double blue);
 void drawPlanet(double angle, double distance, double diameter, double red, double green, double blue);
 void processInput(GLFWwindow* window, Camera* camera);
+void processInput(GLFWwindow *window);
 // void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_callback(GLFWwindow* window, Mouse* mouse, Camera* camera, float* yaw, float* pitch);
 void mouse_move_callback(GLFWwindow* window, double xpos, double ypos);

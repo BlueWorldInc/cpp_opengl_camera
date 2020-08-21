@@ -1,6 +1,6 @@
 #include <app.h>
 
-const GLchar* vertex120 = R"END(
+const GLchar* vertex120_old = R"END(
 #version 330 core
 layout (location = 0) in vec3 aPos;
 attribute vec3 position;
@@ -18,6 +18,35 @@ void main()
     outUvs = inUvs;
     gl_Position = projection * matrix * camera * vec4(position, 1.f);
 }
+)END";
+
+const GLchar* vertex120 = R"END(
+    #version 330 core
+    layout (location = 0) in vec3 aPos;
+    layout (location = 1) in vec2 aTexCoord;
+
+    out vec2 TexCoord;
+
+    uniform mat4 model;
+    uniform mat4 view;
+    uniform mat4 projection;
+
+    attribute vec3 color;
+    attribute vec2 inUvs;
+    varying vec3 outColor;
+    varying vec2 outUvs;
+
+    attribute vec3 position;
+    uniform mat4 matrix;
+    uniform mat4 camera;
+
+    void main()
+    {
+        outColor = color;
+        outUvs = inUvs;
+        gl_Position = projection * matrix * camera * vec4(position, 1.0f);
+        TexCoord = vec2(aTexCoord.x, aTexCoord.y);
+    }
 )END";
 
 const GLchar* raster120 = R"END(
@@ -214,9 +243,9 @@ int main(void) {
     GLuint uniformTime;
     uniformTime = glGetUniformLocation(shaderProgram, "time");
 
-    glm::mat4 projectionMatrix = glm::mat4(1.f);// glm::perspective(glm::radians(60.f), 1.f, 0.f, 10.f);
-    GLint uniformProjection = glGetUniformLocation(shaderProgram, "projection");
-    glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+    // glm::mat4 projectionMatrix = glm::mat4(1.f);// glm::perspective(glm::radians(60.f), 1.f, 0.f, 10.f);
+    // GLint uniformProjection = glGetUniformLocation(shaderProgram, "projection");
+    // glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     
     // tex
     
@@ -359,11 +388,12 @@ int main(void) {
         float camX = sin(glfwGetTime()) * radius;
         float camZ = cos(glfwGetTime()) * radius;
 
-        camera = glm::lookAt(cam.cameraPos, cam.cameraPos + cam.cameraFront, cam.cameraUp);
+        // camera = glm::lookAt(cam.cameraPos, cam.cameraPos + cam.cameraFront, cam.cameraUp);
+        camera = glm::lookAt(cam.cameraPos, glm::vec3(0, 0, 1), cam.cameraUp);
         
         glUniformMatrix4fv(uniformCam, 1, GL_FALSE, glm::value_ptr(camera));
 
-        glDrawElements(GL_LINES, sizeof(indices), GL_UNSIGNED_BYTE, 0);
+        glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_BYTE, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
